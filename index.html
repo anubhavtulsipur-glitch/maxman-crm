@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAXMAN CARE - Enterprise Tele-Health CRM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
+
+    <!-- Top Branding Navbar -->
+    <header class="bg-slate-950 border-b border-slate-800 px-6 py-3 flex justify-between items-center shadow-lg">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-r from-red-600 to-amber-500 text-white font-black text-lg px-3 py-1 rounded-lg tracking-wider">
+                MAXMAN CARE
+            </div>
+            <span class="text-xs text-slate-400 font-medium border-l border-slate-800 pl-3">Tele-Sales & Fulfillment Portal</span>
+        </div>
+
+        <!-- Role Switcher Simulation -->
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 bg-slate-800/80 p-1.5 rounded-lg border border-slate-700">
+                <span class="text-xs font-semibold text-slate-400 pl-2"><i class="fa-solid fa-user-shield text-amber-500 mr-1"></i> View Mode:</span>
+                <select id="roleSelector" onchange="switchRoleView()" class="bg-slate-900 text-amber-400 text-xs font-bold px-2 py-1 rounded border border-slate-700 focus:outline-none">
+                    <option value="AGENT">Telecaller / Agent View</option>
+                    <option value="CONFIRMATION">Confirmation Team</option>
+                    <option value="LOGISTICS">Logistics & RTO Team</option>
+                    <option value="MANAGER">Manager / TL Dashboard</option>
+                </select>
+            </div>
+
+            <button onclick="toggleModal('addModal')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                <i class="fa-solid fa-user-plus mr-1"></i> New Patient
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-56 bg-slate-950 border-r border-slate-800 p-4 space-y-6 flex flex-col justify-between">
+            <div class="space-y-4">
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-2">Navigation</div>
+                <nav class="space-y-1 text-xs">
+                    <a href="#" onclick="filterStatus('ALL')" class="flex justify-between items-center px-3 py-2 bg-slate-800 text-white font-medium rounded-lg"><span><i class="fa-solid fa-list mr-2 text-indigo-400"></i> All Leads</span> <span id="countAll" class="bg-slate-700 px-1.5 py-0.5 rounded text-slate-300">0</span></a>
+                    <a href="#" onclick="filterStatus('NEW_LEAD')" class="flex justify-between items-center px-3 py-2 text-slate-400 hover:bg-slate-900 hover:text-white rounded-lg transition"><span><i class="fa-solid fa-headset mr-2 text-blue-400"></i> Fresh Leads</span> <span id="countFresh" class="text-blue-400 font-bold">0</span></a>
+                    <a href="#" onclick="filterStatus('CALLBACK')" class="flex justify-between items-center px-3 py-2 text-slate-400 hover:bg-slate-900 hover:text-white rounded-lg transition"><span><i class="fa-solid fa-clock-rotate-left mr-2 text-amber-400"></i> Callbacks</span> <span id="countCallback" class="text-amber-400 font-bold">0</span></a>
+                    <a href="#" onclick="filterStatus('CONFIRMED')" class="flex justify-between items-center px-3 py-2 text-slate-400 hover:bg-slate-900 hover:text-white rounded-lg transition"><span><i class="fa-solid fa-circle-check mr-2 text-emerald-400"></i> Confirmed Orders</span> <span id="countConfirmed" class="text-emerald-400 font-bold">0</span></a>
+                    <a href="#" onclick="filterStatus('DISPATCHED')" class="flex justify-between items-center px-3 py-2 text-slate-400 hover:bg-slate-900 hover:text-white rounded-lg transition"><span><i class="fa-solid fa-truck-fast mr-2 text-cyan-400"></i> In Transit</span> <span id="countDispatched" class="text-cyan-400 font-bold">0</span></a>
+                    <a href="#" onclick="filterStatus('RTO')" class="flex justify-between items-center px-3 py-2 text-slate-400 hover:bg-slate-900 hover:text-white rounded-lg transition"><span><i class="fa-solid fa-rotate-left mr-2 text-rose-400"></i> RTO Cases</span> <span id="countRTO" class="text-rose-400 font-bold">0</span></a>
+                </nav>
+            </div>
+
+            <!-- Agent Quick Stats Box -->
+            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs space-y-2">
+                <div class="text-slate-400 font-semibold flex justify-between"><span>My Revenue:</span> <span id="statRev" class="text-emerald-400 font-bold">₹0</span></div>
+                <div class="text-slate-400 font-semibold flex justify-between"><span>Target:</span> <span class="text-slate-200">₹1,50,000</span></div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div class="bg-emerald-500 h-full w-1/3"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Grid / Table -->
+        <main class="flex-1 bg-slate-900 p-6 overflow-y-auto flex flex-col space-y-4">
+            
+            <!-- Dynamic Stats Cards (Manager / Role Dashboard) -->
+            <div id="statsBanner" class="grid grid-cols-4 gap-4">
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">Total Pipeline Value</p>
+                        <h3 id="dashTotalVal" class="text-xl font-bold text-emerald-400 mt-1">₹0</h3>
+                    </div>
+                    <i class="fa-solid fa-indian-rupee-sign text-slate-700 text-2xl"></i>
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">Confirmation %</p>
+                        <h3 id="dashConfRate" class="text-xl font-bold text-amber-400 mt-1">0%</h3>
+                    </div>
+                    <i class="fa-solid fa-chart-line text-slate-700 text-2xl"></i>
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">Logistics RTO %</p>
+                        <h3 id="dashRTORate" class="text-xl font-bold text-rose-400 mt-1">0%</h3>
+                    </div>
+                    <i class="fa-solid fa-triangle-exclamation text-slate-700 text-2xl"></i>
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 font-medium">Active Tele-Agents</p>
+                        <h3 class="text-xl font-bold text-indigo-400 mt-1">12 Online</h3>
+                    </div>
+                    <i class="fa-solid fa-users text-slate-700 text-2xl"></i>
+                </div>
+            </div>
+
+            <!-- Leads Data Table -->
+            <div class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden flex-1 flex flex-col">
+                <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                    <h2 id="tableHeading" class="text-sm font-bold text-slate-200">All Patient Records</h2>
+                    <input type="text" id="searchInput" onkeyup="searchLeads()" placeholder="Search Patient Name / Phone / City..." class="bg-slate-900 border border-slate-800 text-xs px-3 py-1.5 rounded-lg w-64 text-slate-200 focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div class="overflow-x-auto flex-1">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
+                            <tr>
+                                <th class="p-3">Patient Name</th>
+                                <th class="p-3">Phone & Location</th>
+                                <th class="p-3">Disease / Health Concern</th>
+                                <th class="p-3">Regimen Pack</th>
+                                <th class="p-3">Amount</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Assigned Agent</th>
+                                <th class="p-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadTableBody" class="divide-y divide-slate-800/60 text-slate-300">
+                            <!-- Rows injected via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- DETAIL PATIENT MODAL -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative space-y-4">
+            <button onclick="toggleModal('detailModal')" class="absolute right-4 top-4 text-slate-500 hover:text-slate-300"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                    <h2 id="modalName" class="text-lg font-bold text-white">Patient Name</h2>
+                    <p id="modalPhone" class="text-xs font-mono text-amber-400 mt-0.5"></p>
+                </div>
+                <div class="flex space-x-2">
+                    <a id="modalCall" href="#" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition"><i class="fa-solid fa-phone mr-1"></i> Call Patient</a>
+                    <a id="modalWa" href="#" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition"><i class="fa-brands fa-whatsapp mr-1"></i> WhatsApp</a>
+                </div>
+            </div>
+
+            <form onsubmit="saveDetails(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="modalId">
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-400 mb-1">Status Workflow</label>
+                        <select id="modalStatus" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-amber-500">
+                            <option value="NEW_LEAD">Fresh Lead</option>
+                            <option value="CALLBACK">Callback / Followup</option>
+                            <option value="CONFIRMED">Order Confirmed</option>
+                            <option value="DISPATCHED">Dispatched / In Transit</option>
+                            <option value="DELIVERED">Delivered (Won)</option>
+                            <option value="RTO">RTO (Returned)</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-400 mb-1">Health Concern / Disease</label>
+                        <input type="text" id="modalDisease" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-400 mb-1">Deal Value (₹)</label>
+                        <input type="number" id="modalValue" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-400 mb-1">AWB / Courier Tracking No.</label>
+                        <input type="text" id="modalAwb" placeholder="Delhivery / XpressBees AWB" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-400 mb-1">RTO / NDR Reason (If Any)</label>
+                        <input type="text" id="modalRtoReason" placeholder="Customer Refused / Address Incomplete" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-400 mb-1">Call Logs & Health Consultation Notes</label>
+                    <textarea id="modalNotes" rows="4" placeholder="Patient symptoms, diet advice, previous medications..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-lg text-xs transition">Save Record Updates</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD PATIENT MODAL -->
+    <div id="addModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative space-y-4">
+            <button onclick="toggleModal('addModal')" class="absolute right-4 top-4 text-slate-500 hover:text-slate-300"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider">Add New Patient Enquiry</h3>
+            
+            <form onsubmit="addPatient(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">Patient Name</label>
+                    <input type="text" id="addName" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-slate-400 mb-1">Phone Number</label>
+                        <input type="text" id="addPhone" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Age</label>
+                        <input type="number" id="addAge" value="32" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Health Concern / Disease</label>
+                    <input type="text" id="addDisease" placeholder="e.g. Stamina / Wellness" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-slate-400 mb-1">Regimen Pack</label>
+                        <select id="addRegimen" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200">
+                            <option value="1 Month Course">1 Month Course</option>
+                            <option value="2 Month Course">2 Month Course</option>
+                            <option value="3 Month Course">3 Month Complete Course</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Amount (₹)</label>
+                        <input type="number" id="addValue" value="1999" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg mt-2 transition">Create Patient Record</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let rawLeads = [];
+        let currentFilter = 'ALL';
+
+        async function loadLeads() {
+            const res = await fetch('/api/leads');
+            const result = await res.json();
+            rawLeads = result.data || [];
+            updateCounts(rawLeads);
+            renderTable(rawLeads);
+        }
+
+        function updateCounts(leads) {
+            document.getElementById('countAll').innerText = leads.length;
+            document.getElementById('countFresh').innerText = leads.filter(l => l.status === 'NEW_LEAD').length;
+            document.getElementById('countCallback').innerText = leads.filter(l => l.status === 'CALLBACK').length;
+            document.getElementById('countConfirmed').innerText = leads.filter(l => l.status === 'CONFIRMED').length;
+            document.getElementById('countDispatched').innerText = leads.filter(l => l.status === 'DISPATCHED').length;
+            document.getElementById('countRTO').innerText = leads.filter(l => l.status === 'RTO').length;
+
+            let totalVal = leads.reduce((sum, l) => sum + (parseFloat(l.order_value) || 0), 0);
+            let confCount = leads.filter(l => l.status === 'CONFIRMED' || l.status === 'DELIVERED').length;
+            let rtoCount = leads.filter(l => l.status === 'RTO').length;
+
+            document.getElementById('dashTotalVal').innerText = '₹' + totalVal.toLocaleString('en-IN');
+            document.getElementById('statRev').innerText = '₹' + totalVal.toLocaleString('en-IN');
+            document.getElementById('dashConfRate').innerText = leads.length ? Math.round((confCount / leads.length) * 100) + '%' : '0%';
+            document.getElementById('dashRTORate').innerText = leads.length ? Math.round((rtoCount / leads.length) * 100) + '%' : '0%';
+        }
+
+        function renderTable(leads) {
+            const tbody = document.getElementById('leadTableBody');
+            tbody.innerHTML = '';
+
+            let filtered = currentFilter === 'ALL' ? leads : leads.filter(l => l.status === currentFilter);
+
+            filtered.forEach(lead => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-900/60 transition';
+                
+                let badgeClass = 'bg-slate-800 text-slate-300';
+                if(lead.status === 'NEW_LEAD') badgeClass = 'bg-blue-950 text-blue-400 border border-blue-800';
+                if(lead.status === 'CONFIRMED') badgeClass = 'bg-emerald-950 text-emerald-400 border border-emerald-800';
+                if(lead.status === 'DISPATCHED') badgeClass = 'bg-cyan-950 text-cyan-400 border border-cyan-800';
+                if(lead.status === 'RTO') badgeClass = 'bg-rose-950 text-rose-400 border border-rose-800';
+
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-200">${lead.patient_name} <span class="text-xs text-slate-500 font-normal">(${lead.age || 30}y)</span></td>
+                    <td class="p-3 font-mono text-slate-400">${lead.phone}</td>
+                    <td class="p-3 text-amber-300/90 font-medium">${lead.disease || 'General'}</td>
+                    <td class="p-3 text-slate-400">${lead.regimen_pack || '1 Month'}</td>
+                    <td class="p-3 font-bold text-emerald-400">₹${lead.order_value || 0}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${lead.status}</span></td>
+                    <td class="p-3 text-slate-400">${lead.assigned_agent || 'Agent Aman'}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="openDetailModal(${lead.id})" class="bg-slate-800 hover:bg-slate-700 text-amber-400 px-2.5 py-1 rounded-md text-xs font-semibold border border-slate-700">
+                            Open File
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterStatus(status) {
+            currentFilter = status;
+            document.getElementById('tableHeading').innerText = status === 'ALL' ? 'All Patient Records' : `Status: ${status}`;
+            renderTable(rawLeads);
+        }
+
+        function switchRoleView() {
+            const role = document.getElementById('roleSelector').value;
+            if(role === 'CONFIRMED') filterStatus('CONFIRMED');
+            else if(role === 'LOGISTICS') filterStatus('DISPATCHED');
+            else filterStatus('ALL');
+        }
+
+        function openDetailModal(id) {
+            const lead = rawLeads.find(l => l.id === id);
+            if (!lead) return;
+
+            document.getElementById("modalId").value = lead.id;
+            document.getElementById("modalName").innerText = lead.patient_name;
+            document.getElementById("modalPhone").innerText = lead.phone;
+            document.getElementById("modalCall").href = `tel:${lead.phone}`;
+            document.getElementById("modalWa").href = `https://wa.me/91${lead.phone}`;
+            
+            document.getElementById("modalStatus").value = lead.status || 'NEW_LEAD';
+            document.getElementById("modalDisease").value = lead.disease || '';
+            document.getElementById("modalValue").value = lead.order_value || 0;
+            document.getElementById("modalAwb").value = lead.awb_number || '';
+            document.getElementById("modalRtoReason").value = lead.rto_reason || '';
+            document.getElementById("modalNotes").value = lead.notes || '';
+
+            toggleModal('detailModal');
+        }
+
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle("hidden");
+        }
+
+        async function saveDetails(e) {
+            e.preventDefault();
+            const id = document.getElementById("modalId").value;
+            const status = document.getElementById("modalStatus").value;
+            const disease = document.getElementById("modalDisease").value;
+            const order_value = document.getElementById("modalValue").value;
+            const awb_number = document.getElementById("modalAwb").value;
+            const rto_reason = document.getElementById("modalRtoReason").value;
+            const notes = document.getElementById("modalNotes").value;
+
+            await fetch("/api/leads/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, status, disease, order_value, awb_number, rto_reason, notes })
+            });
+
+            toggleModal('detailModal');
+            loadLeads();
+        }
+
+        async function addPatient(e) {
+            e.preventDefault();
+            const patient_name = document.getElementById("addName").value;
+            const phone = document.getElementById("addPhone").value;
+            const age = document.getElementById("addAge").value;
+            const disease = document.getElementById("addDisease").value;
+            const regimen_pack = document.getElementById("addRegimen").value;
+            const order_value = document.getElementById("addValue").value;
+
+            await fetch("/api/leads/add", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ patient_name, phone, age, disease, regimen_pack, order_value })
+            });
+
+            toggleModal('addModal');
+            loadLeads();
+        }
+
+        loadLeads();
+    </script>
+</body>
+</html>
