@@ -11,14 +11,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname)));
 
-// Routes
+// Main URL par Landing Page khulega
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'Landing.html'));
 });
 
-// Simple JSON Data storage example route (if needed for CRM leads)
-const DATA_FILE = path.join(__dirname, 'leads.json');
+// /crm URL par CRM (index.html) khulega
+app.get('/crm', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
+// Leads save karne ki API
+const DATA_FILE = path.join(__dirname, 'leads.json');
 app.post('/api/leads', (req, res) => {
     let leads = [];
     if (fs.existsSync(DATA_FILE)) {
