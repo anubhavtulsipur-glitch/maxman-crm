@@ -1,43 +1,43 @@
 [
   {
-    "username": "owner",
-    "password": "owner123",
+    "username": "Owner",
+    "password": "12345",
     "role": "Owner",
-    "name": "Company Owner"
+    "name": "Owner"
   },
   {
-    "username": "manager",
-    "password": "manager123",
+    "username": "Manager",
+    "password": "12345",
     "role": "Manager",
     "name": "Sales Manager"
   },
   {
-    "username": "tl",
-    "password": "tl123",
+    "username": "TL",
+    "password": "12345",
     "role": "Team Leader",
     "name": "Team Lead"
   },
   {
-    "username": "agent",
-    "password": "agent123",
+    "username": "Agent",
+    "password": "12345",
     "role": "Agent",
     "name": "Calling Agent"
   },
   {
-    "username": "rto",
-    "password": "rto123",
+    "username": "RTO",
+    "password": "12345",
     "role": "RTO",
     "name": "RTO Executive"
   },
   {
-    "username": "confirmation",
-    "password": "conf123",
+    "username": "Confirmation",
+    "password": "12345",
     "role": "Confirmation",
     "name": "Confirmation Team"
   },
   {
-    "username": "hr",
-    "password": "hr123",
+    "username": "HR",
+    "password": "12345",
     "role": "HR",
     "name": "HR Manager"
   }
