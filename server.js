@@ -4,17 +4,14 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// Serve main HTML file from root directory
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Database helper functions
 const getUsers = () => {
     try {
         const data = fs.readFileSync(path.join(__dirname, 'database', 'users.json'), 'utf8');
@@ -22,6 +19,10 @@ const getUsers = () => {
     } catch (err) {
         return [];
     }
+};
+
+const saveUsers = (users) => {
+    fs.writeFileSync(path.join(__dirname, 'database', 'users.json'), JSON.stringify(users, null, 2));
 };
 
 const getLeads = () => {
@@ -33,11 +34,11 @@ const getLeads = () => {
     }
 };
 
-// Login API endpoint
+// Login API
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const users = getUsers();
-    const user = users.find(u => u.username === username && u.password === password);
+    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
     
     if (user) {
         res.json({ success: true, role: user.role, name: user.name });
@@ -46,16 +47,34 @@ app.post('/api/login', (req, res) => {
     }
 });
 
+// Register User API (Website se naya user banane ke liye)
+app.post('/api/register', (req, res) => {
+    const { username, password, role, name } = req.body;
+    let users = getUsers();
+    
+    if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+        return res.status(400).json({ success: false, message: 'Username already exists!' });
+    }
+
+    users.push({ username, password, role, name });
+    try {
+        saveUsers(users);
+        res.json({ success: true, message: 'User registered successfully!' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Failed to register user' });
+    }
+});
+
 // Forgot / Reset Password API
 app.post('/api/forgot-password', (req, res) => {
     const { username, newPassword } = req.body;
     let users = getUsers();
-    const userIndex = users.findIndex(u => u.username === username);
+    const userIndex = users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
 
     if (userIndex !== -1) {
         users[userIndex].password = newPassword;
         try {
-            fs.writeFileSync(path.join(__dirname, 'database', 'users.json'), JSON.stringify(users, null, 2));
+            saveUsers(users);
             res.json({ success: true, message: 'Password reset successfully!' });
         } catch (err) {
             res.status(500).json({ success: false, message: 'Failed to update password' });
@@ -71,7 +90,6 @@ app.get('/api/leads', (req, res) => {
     res.json(leads);
 });
 
-// Start server
 app.listen(PORT, () => {
-    console.log(`Maxman Care CRM Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
