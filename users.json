@@ -1,16 +1,44 @@
 [
   {
     "username": "owner",
-    "password": "123",
+    "password": "owner123",
     "role": "Owner",
-    "name": "Master Owner",
-    "phone": "9999999999"
+    "name": "Company Owner"
   },
   {
-    "username": "hr_admin",
-    "password": "123",
+    "username": "manager",
+    "password": "manager123",
+    "role": "Manager",
+    "name": "Sales Manager"
+  },
+  {
+    "username": "tl",
+    "password": "tl123",
+    "role": "Team Leader",
+    "name": "Team Lead"
+  },
+  {
+    "username": "agent",
+    "password": "agent123",
+    "role": "Agent",
+    "name": "Calling Agent"
+  },
+  {
+    "username": "rto",
+    "password": "rto123",
+    "role": "RTO",
+    "name": "RTO Executive"
+  },
+  {
+    "username": "confirmation",
+    "password": "conf123",
+    "role": "Confirmation",
+    "name": "Confirmation Team"
+  },
+  {
+    "username": "hr",
+    "password": "hr123",
     "role": "HR",
-    "name": "HR Manager",
-    "phone": "8888888888"
+    "name": "HR Manager"
   }
 ]
