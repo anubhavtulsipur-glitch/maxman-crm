@@ -29,6 +29,11 @@
                     Sign In
                 </button>
             </form>
+
+            <div class="mt-4 text-center">
+                <button type="button" onclick="toggleForgotPassword()" class="text-xs text-blue-600 hover:underline font-medium">Forgot Password?</button>
+            </div>
+
             <div id="error-msg" class="mt-4 text-center text-xs text-red-500 font-medium hidden"></div>
         </div>
     </div>
@@ -122,6 +127,26 @@
             }
         }
 
+        function toggleForgotPassword() {
+            const username = prompt("Enter your username:");
+            if (!username) return;
+            const newPassword = prompt("Enter your new password:");
+            if (!newPassword) return;
+
+            fetch('/api/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, newPassword })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(err => {
+                alert('Something went wrong!');
+            });
+        }
+
         function showDashboard(user) {
             document.getElementById('login-container').classList.add('hidden');
             document.getElementById('dashboard-container').classList.remove('hidden');
@@ -159,7 +184,200 @@
             location.reload();
         }
 
-        // Auto login check on load
+        window.onload = () => {
+            const savedUser = localStorage.getItem('crm_user');
+            if (savedUser) {
+                showDashboard(JSON.parse(savedUser));
+            }
+        };
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAXMAN CARE - Multi-Tier CRM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans">
+
+    <!-- Login Container -->
+    <div id="login-container" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-slate-800">MAXMAN CARE</h1>
+                <p class="text-sm text-slate-500 mt-1">Healthcare CRM Portal</p>
+            </div>
+            
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Username</label>
+                    <input type="text" id="username" required class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="Enter your username">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Password</label>
+                    <input type="password" id="password" required class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition duration-200 shadow-lg shadow-blue-500/20 text-sm">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-4 text-center">
+                <button type="button" onclick="toggleForgotPassword()" class="text-xs text-blue-600 hover:underline font-medium">Forgot Password?</button>
+            </div>
+
+            <div id="error-msg" class="mt-4 text-center text-xs text-red-500 font-medium hidden"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard Container (Hidden by default) -->
+    <div id="dashboard-container" class="min-h-screen flex flex-col hidden">
+        <!-- Top Navbar -->
+        <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
+            <div class="flex items-center space-x-3">
+                <h2 class="text-lg font-bold text-slate-800">MAXMAN CARE CRM</h2>
+                <span id="user-role-badge" class="px-2.5 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-full uppercase">Role</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span id="user-welcome" class="text-sm font-medium text-slate-600">Welcome</span>
+                <button onclick="handleLogout()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-semibold transition">Logout</button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-6 max-w-7xl w-full mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-semibold text-slate-400 uppercase">Total Leads</p>
+                    <h3 id="total-leads-count" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-semibold text-slate-400 uppercase">Assigned Leads</p>
+                    <h3 class="text-2xl font-bold text-blue-600 mt-1">0</h3>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-semibold text-slate-400 uppercase">Converted</p>
+                    <h3 class="text-2xl font-bold text-emerald-600 mt-1">0</h3>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-semibold text-slate-400 uppercase">RTO / Pending</p>
+                    <h3 class="text-2xl font-bold text-amber-600 mt-1">0</h3>
+                </div>
+            </div>
+
+            <!-- Leads Table Section -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 text-sm">Leads Management</h3>
+                    <button class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700 transition">+ Add Lead</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-100">
+                                <th class="px-6 py-3 font-semibold">Name</th>
+                                <th class="px-6 py-3 font-semibold">Phone</th>
+                                <th class="px-6 py-3 font-semibold">Product</th>
+                                <th class="px-6 py-3 font-semibold">Status</th>
+                                <th class="px-6 py-3 font-semibold">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-table-body" class="divide-y divide-slate-100 text-sm text-slate-600">
+                            <!-- Dynamic Leads Loaded Here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('crm_user', JSON.stringify(data));
+                    showDashboard(data);
+                } else {
+                    errorMsg.innerText = data.message || 'Invalid credentials';
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorMsg.innerText = 'Server connection error';
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        function toggleForgotPassword() {
+            const username = prompt("Enter your username:");
+            if (!username) return;
+            const newPassword = prompt("Enter your new password:");
+            if (!newPassword) return;
+
+            fetch('/api/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, newPassword })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(err => {
+                alert('Something went wrong!');
+            });
+        }
+
+        function showDashboard(user) {
+            document.getElementById('login-container').classList.add('hidden');
+            document.getElementById('dashboard-container').classList.remove('hidden');
+            document.getElementById('user-welcome').innerText = `Hello, ${user.name}`;
+            document.getElementById('user-role-badge').innerText = user.role;
+            loadLeads();
+        }
+
+        async function loadLeads() {
+            try {
+                const response = await fetch('/api/leads');
+                const leads = await response.json();
+                document.getElementById('total-leads-count').innerText = leads.length;
+                
+                const tbody = document.getElementById('leads-table-body');
+                tbody.innerHTML = '';
+                leads.forEach(lead => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4 font-medium text-slate-800">${lead.name}</td>
+                            <td class="px-6 py-4">${lead.phone}</td>
+                            <td class="px-6 py-4">${lead.product || 'N/A'}</td>
+                            <td class="px-6 py-4"><span class="px-2.5 py-1 bg-amber-50 text-amber-600 text-xs font-semibold rounded-full">${lead.status || 'New'}</span></td>
+                            <td class="px-6 py-4"><button class="text-blue-600 hover:underline font-medium text-xs">Update</button></td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error('Failed to load leads', err);
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('crm_user');
+            location.reload();
+        }
+
         window.onload = () => {
             const savedUser = localStorage.getItem('crm_user');
             if (savedUser) {
