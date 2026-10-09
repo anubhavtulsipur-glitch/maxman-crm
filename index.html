@@ -14,98 +14,75 @@
         .blinking-row {
             animation: blink-animation 1s infinite;
         }
+        /* Custom scrollbar and sleek look */
+        body {
+            background-color: #030712;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(29, 78, 216, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 min-h-screen font-sans text-slate-100 flex items-center justify-center p-4">
+<body class="min-h-screen font-sans text-slate-100 flex items-center justify-center p-4">
 
     <!-- Login Container -->
-    <div id="login-container" class="bg-slate-900/90 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-xl border border-slate-800">
-        <div class="text-center mb-8">
-            <span class="bg-blue-500/10 text-blue-400 text-xs font-semibold px-3 py-1 rounded-full border border-blue-500/20 uppercase tracking-widest">Secure Portal</span>
-            <h1 class="text-3xl font-extrabold text-white mt-3 tracking-tight">MAXMAN CARE</h1>
-            <p class="text-sm text-slate-400 mt-1">Apna role select karke login karein</p>
+    <div id="login-container" class="bg-slate-900/80 backdrop-blur-2xl p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-800/80 shadow-blue-950/20">
+        <div class="text-center mb-6">
+            <span class="bg-blue-600/10 text-blue-400 text-xs font-semibold px-3.5 py-1.5 rounded-full border border-blue-500/20 uppercase tracking-widest">Secure Portal</span>
+            <h1 class="text-3xl font-extrabold text-white mt-4 tracking-tight">MAXMAN CARE</h1>
+            <p id="form-subtitle" class="text-sm text-slate-400 mt-1">Apne account mein login karein</p>
         </div>
 
-        <!-- Role Selection Cards -->
-        <div class="grid grid-cols-2 gap-3.5 mb-6" id="role-buttons">
-            <button type="button" onclick="selectRole('Owner', 'Owner')" class="p-4 bg-slate-800/80 hover:bg-blue-600/20 border border-slate-700/80 hover:border-blue-500 rounded-2xl text-left transition-all duration-200 group flex items-center space-x-3 shadow-sm">
-                <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-lg group-hover:bg-blue-500 group-hover:text-white transition">👑</div>
-                <div>
-                    <p class="text-xs font-bold text-blue-400 uppercase tracking-wider">Owner</p>
-                    <p class="text-sm font-semibold text-white">Full Access</p>
-                </div>
-            </button>
-
-            <button type="button" onclick="selectRole('Manager', 'Manager')" class="p-4 bg-slate-800/80 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl text-left transition-all duration-200 group flex items-center space-x-3 shadow-sm">
-                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold text-lg group-hover:bg-indigo-500 group-hover:text-white transition">📊</div>
-                <div>
-                    <p class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Manager</p>
-                    <p class="text-sm font-semibold text-white">Sales Manager</p>
-                </div>
-            </button>
-
-            <button type="button" onclick="selectRole('TL', 'Team Leader')" class="p-4 bg-slate-800/80 hover:bg-purple-600/20 border border-slate-700/80 hover:border-purple-500 rounded-2xl text-left transition-all duration-200 group flex items-center space-x-3 shadow-sm">
-                <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-lg group-hover:bg-purple-500 group-hover:text-white transition">👥</div>
-                <div>
-                    <p class="text-xs font-bold text-purple-400 uppercase tracking-wider">TL</p>
-                    <p class="text-sm font-semibold text-white">Team Lead</p>
-                </div>
-            </button>
-
-            <button type="button" onclick="selectRole('Agent', 'Agent')" class="p-4 bg-slate-800/80 hover:bg-emerald-600/20 border border-slate-700/80 hover:border-emerald-500 rounded-2xl text-left transition-all duration-200 group flex items-center space-x-3 shadow-sm">
-                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-lg group-hover:bg-emerald-500 group-hover:text-white transition">📞</div>
-                <div>
-                    <p class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Agent</p>
-                    <p class="text-sm font-semibold text-white">Calling Agent</p>
-                </div>
-            </button>
-
-            <button type="button" onclick="selectRole('RTO', 'RTO')" class="p-4 bg-slate-800/80 hover:bg-amber-600/20 border border-slate-700/80 hover:border-amber-500 rounded-2xl text-left transition-all duration-200 group flex items-center space-x-3 shadow-sm">
-                <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-lg group-hover:bg-amber-500 group-hover:text-white transition">🔄</div>
-                <div>
-                    <p class="text-xs font-bold text-amber-400 uppercase tracking-wider">RTO</p>
-                    <p class="text-sm font-semibold text-white">RTO Executive</p>
-                </div>
-            </button>
-
-            <button type="button" onclick="selectRole('Confirmation', 'Confirmation')" class="p-4 bg-slate-800/80 hover:bg-cyan-600/20 border border-slate-700/80 hover:border-cyan-500 rounded-2xl text-left transition-all duration-200 group flex items-center space-x-3 shadow-sm">
-                <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-lg group-hover:bg-cyan-500 group-hover:text-white transition">✅</div>
-                <div>
-                    <p class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Confirmation</p>
-                    <p class="text-sm font-semibold text-white">Confirm Team</p>
-                </div>
-            </button>
-
-            <button type="button" onclick="selectRole('HR', 'HR')" class="p-4 bg-slate-800/80 hover:bg-pink-600/20 border border-slate-700/80 hover:border-pink-500 rounded-2xl text-left transition-all duration-200 group flex items-center space-x-3 shadow-sm col-span-2">
-                <div class="w-10 h-10 rounded-xl bg-pink-500/10 text-pink-400 flex items-center justify-center font-bold text-lg group-hover:bg-pink-500 group-hover:text-white transition">🏢</div>
-                <div>
-                    <p class="text-xs font-bold text-pink-400 uppercase tracking-wider">HR</p>
-                    <p class="text-sm font-semibold text-white">HR Manager</p>
-                </div>
-            </button>
-        </div>
-        
-        <!-- Actual Login Form (Hidden initially) -->
-        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4 hidden">
-            <div class="flex items-center justify-between bg-slate-800 p-4 rounded-2xl border border-slate-700">
-                <div>
-                    <span class="text-xs text-slate-400 block">Selected Role</span>
-                    <span id="selected-role-text" class="text-sm font-bold text-blue-400">None</span>
-                </div>
-                <button type="button" onclick="resetRoleSelection()" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-lg font-medium transition">Change Role</button>
-            </div>
-            <input type="hidden" id="username">
+        <!-- Login Form -->
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password Daalein</label>
-                <input type="password" id="password" required class="w-full px-4 py-3.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="Enter password (12345)">
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Username</label>
+                <input type="text" id="login-username" required class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none text-sm transition" placeholder="Jaise: Owner, Manager, Agent">
             </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/30 text-sm">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Password</label>
+                <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none text-sm transition" placeholder="Password daalein">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 rounded-xl transition duration-200 shadow-lg shadow-blue-600/30 text-sm">
                 Sign In
             </button>
         </form>
 
-        <div class="mt-6 text-center">
-            <button type="button" onclick="toggleForgotPassword()" class="text-xs text-slate-400 hover:text-blue-400 transition font-medium">Forgot Password?</button>
+        <!-- Register Form (Hidden by default) -->
+        <form id="register-form" onsubmit="handleRegister(event)" class="space-y-3 hidden">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Username</label>
+                <input type="text" id="reg-username" required class="w-full px-3 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-white text-sm" placeholder="Naya username">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Password</label>
+                <input type="password" id="reg-password" required class="w-full px-3 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-white text-sm" placeholder="Naya password">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Role / Pad</label>
+                <select id="reg-role" class="w-full px-3 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-white text-sm">
+                    <option value="Owner">Owner</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Team Leader">Team Leader</option>
+                    <option value="Agent">Agent</option>
+                    <option value="RTO">RTO</option>
+                    <option value="Confirmation">Confirmation</option>
+                    <option value="HR">HR</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
+                <input type="text" id="reg-name" required class="w-full px-3 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-white text-sm" placeholder="Aapka naam">
+            </div>
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition duration-200 text-sm shadow-lg shadow-emerald-950/50">
+                Create User
+            </button>
+        </form>
+
+        <div class="mt-5 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-4">
+            <button type="button" onclick="toggleForgotPassword()" class="hover:text-blue-400 font-medium">Forgot Password?</button>
+            <button type="button" id="toggle-mode-btn" onclick="toggleMode()" class="text-blue-400 hover:underline font-semibold">+ Create New User</button>
         </div>
 
         <div id="error-msg" class="mt-4 text-center text-xs text-red-400 font-medium hidden"></div>
@@ -113,10 +90,10 @@
 
     <!-- Dashboard Container -->
     <div id="dashboard-container" class="min-h-screen flex flex-col hidden w-full">
-        <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex justify-between items-center shadow-md">
+        <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800/80 px-6 py-4 flex justify-between items-center shadow-md">
             <div class="flex items-center space-x-3">
                 <h2 class="text-lg font-bold text-white tracking-wide">MAXMAN CARE CRM</h2>
-                <span id="user-role-badge" class="px-2.5 py-1 bg-blue-900/60 text-blue-300 border border-blue-700/50 text-xs font-semibold rounded-full uppercase">Role</span>
+                <span id="user-role-badge" class="px-2.5 py-1 bg-blue-600/20 text-blue-400 border border-blue-500/30 text-xs font-semibold rounded-full uppercase">Role</span>
             </div>
             <div class="flex items-center space-x-4">
                 <span id="user-welcome" class="text-sm font-medium text-slate-300">Welcome</span>
@@ -126,33 +103,33 @@
 
         <main class="flex-1 p-6 max-w-7xl w-full mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-sm">
+                <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 p-5 rounded-2xl shadow-sm">
                     <p class="text-xs font-semibold text-slate-400 uppercase">Total Leads</p>
                     <h3 id="total-leads-count" class="text-2xl font-bold text-white mt-1">0</h3>
                 </div>
-                <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-sm">
+                <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 p-5 rounded-2xl shadow-sm">
                     <p class="text-xs font-semibold text-slate-400 uppercase">Assigned Leads</p>
                     <h3 class="text-2xl font-bold text-blue-400 mt-1">0</h3>
                 </div>
-                <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-sm">
+                <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 p-5 rounded-2xl shadow-sm">
                     <p class="text-xs font-semibold text-slate-400 uppercase">Converted</p>
                     <h3 class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
                 </div>
-                <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl shadow-sm">
+                <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 p-5 rounded-2xl shadow-sm">
                     <p class="text-xs font-semibold text-slate-400 uppercase">RTO / Pending</p>
                     <h3 class="text-2xl font-bold text-amber-400 mt-1">0</h3>
                 </div>
             </div>
 
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center">
+            <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-800/80 flex justify-between items-center">
                     <h3 class="font-bold text-white text-sm">Leads Management</h3>
                     <button class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-500 transition shadow">+ Add Lead</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-950/50 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800">
+                            <tr class="bg-slate-950/40 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800/80">
                                 <th class="px-6 py-3 font-semibold">Name</th>
                                 <th class="px-6 py-3 font-semibold">Phone</th>
                                 <th class="px-6 py-3 font-semibold">Product</th>
@@ -160,7 +137,7 @@
                                 <th class="px-6 py-3 font-semibold">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="leads-table-body" class="divide-y divide-slate-800 text-sm text-slate-300">
+                        <tbody id="leads-table-body" class="divide-y divide-slate-800/60 text-sm text-slate-300">
                         </tbody>
                     </table>
                 </div>
@@ -169,26 +146,36 @@
     </div>
 
     <script>
+        let isRegisterMode = false;
         let activeCallRowId = null;
 
-        function selectRole(username, roleName) {
-            document.getElementById('username').value = username;
-            document.getElementById('selected-role-text').innerText = `${roleName} (${username})`;
-            document.getElementById('role-buttons').classList.add('hidden');
-            document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('error-msg').classList.add('hidden');
-        }
+        function toggleMode() {
+            isRegisterMode = !isRegisterMode;
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const subtitle = document.getElementById('form-subtitle');
+            const toggleBtn = document.getElementById('toggle-mode-btn');
+            const errorMsg = document.getElementById('error-msg');
+            
+            errorMsg.classList.add('hidden');
 
-        function resetRoleSelection() {
-            document.getElementById('role-buttons').classList.remove('hidden');
-            document.getElementById('login-form').classList.add('hidden');
-            document.getElementById('error-msg').classList.add('hidden');
+            if (isRegisterMode) {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                subtitle.innerText = "Naya account create karein";
+                toggleBtn.innerText = "← Back to Login";
+            } else {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                subtitle.innerText = "Apne account mein login karein";
+                toggleBtn.innerText = "+ Create New User";
+            }
         }
 
         async function handleLogin(e) {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
             const errorMsg = document.getElementById('error-msg');
 
             try {
@@ -212,10 +199,39 @@
             }
         }
 
+        async function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+            const role = document.getElementById('reg-role').value;
+            const name = document.getElementById('reg-name').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, role, name })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('User created successfully! Now you can login.');
+                    toggleMode();
+                } else {
+                    errorMsg.innerText = data.message || 'Registration failed';
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorMsg.innerText = 'Server connection error';
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
         function toggleForgotPassword() {
-            const username = prompt("Enter your username (e.g. Manager, Owner):");
+            const username = prompt("Apna username daalein:");
             if (!username) return;
-            const newPassword = prompt("Enter your new password:");
+            const newPassword = prompt("Naya password daalein:");
             if (!newPassword) return;
 
             fetch('/api/forgot-password', {
@@ -228,7 +244,7 @@
                 alert(data.message);
             })
             .catch(err => {
-                alert('Something went wrong!');
+                alert('Kuch galat ho gaya!');
             });
         }
 
