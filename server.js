@@ -14,21 +14,24 @@ app.get('/', (req, res) => {
 
 const getUsers = () => {
     try {
-        const data = fs.readFileSync(path.join(__dirname, 'database', 'users.json'), 'utf8');
-        return JSON.parse(data);
+        const filePath = path.join(__dirname, 'database', 'users.json');
+        if (!fs.existsSync(filePath)) return [];
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
     } catch (err) {
         return [];
     }
 };
 
 const saveUsers = (users) => {
-    fs.writeFileSync(path.join(__dirname, 'database', 'users.json'), JSON.stringify(users, null, 2));
+    const filePath = path.join(__dirname, 'database', 'users.json');
+    fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
 };
 
 const getLeads = () => {
     try {
-        const data = fs.readFileSync(path.join(__dirname, 'database', 'leads.json'), 'utf8');
-        return JSON.parse(data);
+        const filePath = path.join(__dirname, 'database', 'leads.json');
+        if (!fs.existsSync(filePath)) return [];
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
     } catch (err) {
         return [];
     }
@@ -38,56 +41,46 @@ const getLeads = () => {
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const users = getUsers();
-    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+    const user = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase() && u.password === password.trim());
     
     if (user) {
-        res.json({ success: true, role: user.role, name: user.name });
+        res.json({ success: true, role: user.role, name: user.name, username: user.username });
     } else {
         res.status(401).json({ success: false, message: 'Invalid username or password' });
     }
 });
 
-// Register User API (Website se naya user banane ke liye)
+// Get all users
+app.get('/api/users', (req, res) => {
+    res.json(getUsers());
+});
+
+// Create new user (Owner/Manager can use this)
 app.post('/api/register', (req, res) => {
     const { username, password, role, name } = req.body;
     let users = getUsers();
     
     if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-        return res.status(400).json({ success: false, message: 'Username already exists!' });
+        return res.status(400).json({ success: false, message: 'Username pehle se maujood hai!' });
     }
 
     users.push({ username, password, role, name });
-    try {
-        saveUsers(users);
-        res.json({ success: true, message: 'User registered successfully!' });
-    } catch (err) {
-        res.status(500).json({ success: false, message: 'Failed to register user' });
-    }
+    saveUsers(users);
+    res.json({ success: true, message: 'User successfully create ho gaya!' });
 });
 
-// Forgot / Reset Password API
-app.post('/api/forgot-password', (req, res) => {
-    const { username, newPassword } = req.body;
+// Delete user
+app.delete('/api/users/:username', (req, res) => {
+    const target = req.params.username;
     let users = getUsers();
-    const userIndex = users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
-
-    if (userIndex !== -1) {
-        users[userIndex].password = newPassword;
-        try {
-            saveUsers(users);
-            res.json({ success: true, message: 'Password reset successfully!' });
-        } catch (err) {
-            res.status(500).json({ success: false, message: 'Failed to update password' });
-        }
-    } else {
-        res.status(404).json({ success: false, message: 'Username not found!' });
-    }
+    users = users.filter(u => u.username.toLowerCase() !== target.toLowerCase());
+    saveUsers(users);
+    res.json({ success: true, message: 'User delete ho gaya!' });
 });
 
-// Get Leads API
+// Leads API
 app.get('/api/leads', (req, res) => {
-    const leads = getLeads();
-    res.json(leads);
+    res.json(getLeads());
 });
 
 app.listen(PORT, () => {
