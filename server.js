@@ -33,7 +33,7 @@ const getLeads = () => {
     }
 };
 
-// Simple Login API endpoint for multi-tier verification
+// Login API endpoint
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const users = getUsers();
@@ -43,6 +43,25 @@ app.post('/api/login', (req, res) => {
         res.json({ success: true, role: user.role, name: user.name });
     } else {
         res.status(401).json({ success: false, message: 'Invalid username or password' });
+    }
+});
+
+// Forgot / Reset Password API
+app.post('/api/forgot-password', (req, res) => {
+    const { username, newPassword } = req.body;
+    let users = getUsers();
+    const userIndex = users.findIndex(u => u.username === username);
+
+    if (userIndex !== -1) {
+        users[userIndex].password = newPassword;
+        try {
+            fs.writeFileSync(path.join(__dirname, 'database', 'users.json'), JSON.stringify(users, null, 2));
+            res.json({ success: true, message: 'Password reset successfully!' });
+        } catch (err) {
+            res.status(500).json({ success: false, message: 'Failed to update password' });
+        }
+    } else {
+        res.status(404).json({ success: false, message: 'Username not found!' });
     }
 });
 
