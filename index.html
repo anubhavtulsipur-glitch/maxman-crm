@@ -1,315 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAXMAN CARE - Multi-Tier CRM</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @keyframes blink-animation {
-            0% { background-color: rgba(59, 130, 246, 0.2); }
-            50% { background-color: rgba(59, 130, 246, 0.6); }
-            100% { background-color: rgba(59, 130, 246, 0.2); }
-        }
-        .blinking-row {
-            animation: blink-animation 1s infinite;
-        }
-        /* Custom scrollbar and sleek look */
-        body {
-            background-color: #030712;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(29, 78, 216, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%);
-            background-attachment: fixed;
-        }
-    </style>
-</head>
-<body class="min-h-screen font-sans text-slate-100 flex items-center justify-center p-4">
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const app = express();
+const PORT = process.env.PORT || 10000;
 
-    <!-- Login Container -->
-    <div id="login-container" class="bg-slate-900/80 backdrop-blur-2xl p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-800/80 shadow-blue-950/20">
-        <div class="text-center mb-6">
-            <span class="bg-blue-600/10 text-blue-400 text-xs font-semibold px-3.5 py-1.5 rounded-full border border-blue-500/20 uppercase tracking-widest">Secure Portal</span>
-            <h1 class="text-3xl font-extrabold text-white mt-4 tracking-tight">MAXMAN CARE</h1>
-            <p id="form-subtitle" class="text-sm text-slate-400 mt-1">Apne account mein login karein</p>
-        </div>
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname)));
 
-        <!-- Login Form -->
-        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Username</label>
-                <input type="text" id="login-username" required class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none text-sm transition" placeholder="Jaise: Owner, Manager, Agent">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Password</label>
-                <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none text-sm transition" placeholder="Password daalein">
-            </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 rounded-xl transition duration-200 shadow-lg shadow-blue-600/30 text-sm">
-                Sign In
-            </button>
-        </form>
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-        <!-- Register Form (Hidden by default) -->
-        <form id="register-form" onsubmit="handleRegister(event)" class="space-y-3 hidden">
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Username</label>
-                <input type="text" id="reg-username" required class="w-full px-3 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-white text-sm" placeholder="Naya username">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Password</label>
-                <input type="password" id="reg-password" required class="w-full px-3 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-white text-sm" placeholder="Naya password">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Role / Pad</label>
-                <select id="reg-role" class="w-full px-3 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-white text-sm">
-                    <option value="Owner">Owner</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Team Leader">Team Leader</option>
-                    <option value="Agent">Agent</option>
-                    <option value="RTO">RTO</option>
-                    <option value="Confirmation">Confirmation</option>
-                    <option value="HR">HR</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
-                <input type="text" id="reg-name" required class="w-full px-3 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-white text-sm" placeholder="Aapka naam">
-            </div>
-            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition duration-200 text-sm shadow-lg shadow-emerald-950/50">
-                Create User
-            </button>
-        </form>
+const getUsers = () => {
+    try {
+        const filePath = path.join(__dirname, 'database', 'users.json');
+        if (!fs.existsSync(filePath)) return [];
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (err) {
+        return [];
+    }
+};
 
-        <div class="mt-5 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-4">
-            <button type="button" onclick="toggleForgotPassword()" class="hover:text-blue-400 font-medium">Forgot Password?</button>
-            <button type="button" id="toggle-mode-btn" onclick="toggleMode()" class="text-blue-400 hover:underline font-semibold">+ Create New User</button>
-        </div>
+const saveUsers = (users) => {
+    const filePath = path.join(__dirname, 'database', 'users.json');
+    fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
+};
 
-        <div id="error-msg" class="mt-4 text-center text-xs text-red-400 font-medium hidden"></div>
-    </div>
+const getLeads = () => {
+    try {
+        const filePath = path.join(__dirname, 'database', 'leads.json');
+        if (!fs.existsSync(filePath)) return [];
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (err) {
+        return [];
+    }
+};
 
-    <!-- Dashboard Container -->
-    <div id="dashboard-container" class="min-h-screen flex flex-col hidden w-full">
-        <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800/80 px-6 py-4 flex justify-between items-center shadow-md">
-            <div class="flex items-center space-x-3">
-                <h2 class="text-lg font-bold text-white tracking-wide">MAXMAN CARE CRM</h2>
-                <span id="user-role-badge" class="px-2.5 py-1 bg-blue-600/20 text-blue-400 border border-blue-500/30 text-xs font-semibold rounded-full uppercase">Role</span>
-            </div>
-            <div class="flex items-center space-x-4">
-                <span id="user-welcome" class="text-sm font-medium text-slate-300">Welcome</span>
-                <button onclick="handleLogout()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2 rounded-lg text-xs font-semibold transition">Logout</button>
-            </div>
-        </header>
+// Login API
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    const users = getUsers();
+    const user = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase() && u.password === password.trim());
+    
+    if (user) {
+        res.json({ success: true, role: user.role, name: user.name, username: user.username });
+    } else {
+        res.status(401).json({ success: false, message: 'Invalid username or password' });
+    }
+});
 
-        <main class="flex-1 p-6 max-w-7xl w-full mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 p-5 rounded-2xl shadow-sm">
-                    <p class="text-xs font-semibold text-slate-400 uppercase">Total Leads</p>
-                    <h3 id="total-leads-count" class="text-2xl font-bold text-white mt-1">0</h3>
-                </div>
-                <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 p-5 rounded-2xl shadow-sm">
-                    <p class="text-xs font-semibold text-slate-400 uppercase">Assigned Leads</p>
-                    <h3 class="text-2xl font-bold text-blue-400 mt-1">0</h3>
-                </div>
-                <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 p-5 rounded-2xl shadow-sm">
-                    <p class="text-xs font-semibold text-slate-400 uppercase">Converted</p>
-                    <h3 class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
-                </div>
-                <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 p-5 rounded-2xl shadow-sm">
-                    <p class="text-xs font-semibold text-slate-400 uppercase">RTO / Pending</p>
-                    <h3 class="text-2xl font-bold text-amber-400 mt-1">0</h3>
-                </div>
-            </div>
+// Get all users
+app.get('/api/users', (req, res) => {
+    res.json(getUsers());
+});
 
-            <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-800/80 flex justify-between items-center">
-                    <h3 class="font-bold text-white text-sm">Leads Management</h3>
-                    <button class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-500 transition shadow">+ Add Lead</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-950/40 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800/80">
-                                <th class="px-6 py-3 font-semibold">Name</th>
-                                <th class="px-6 py-3 font-semibold">Phone</th>
-                                <th class="px-6 py-3 font-semibold">Product</th>
-                                <th class="px-6 py-3 font-semibold">Status</th>
-                                <th class="px-6 py-3 font-semibold">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leads-table-body" class="divide-y divide-slate-800/60 text-sm text-slate-300">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
-    </div>
+// Create new user (Owner/Manager can use this)
+app.post('/api/register', (req, res) => {
+    const { username, password, role, name } = req.body;
+    let users = getUsers();
+    
+    if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+        return res.status(400).json({ success: false, message: 'Username pehle se maujood hai!' });
+    }
 
-    <script>
-        let isRegisterMode = false;
-        let activeCallRowId = null;
+    users.push({ username, password, role, name });
+    saveUsers(users);
+    res.json({ success: true, message: 'User successfully create ho gaya!' });
+});
 
-        function toggleMode() {
-            isRegisterMode = !isRegisterMode;
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-            const subtitle = document.getElementById('form-subtitle');
-            const toggleBtn = document.getElementById('toggle-mode-btn');
-            const errorMsg = document.getElementById('error-msg');
-            
-            errorMsg.classList.add('hidden');
+// Delete user
+app.delete('/api/users/:username', (req, res) => {
+    const target = req.params.username;
+    let users = getUsers();
+    users = users.filter(u => u.username.toLowerCase() !== target.toLowerCase());
+    saveUsers(users);
+    res.json({ success: true, message: 'User delete ho gaya!' });
+});
 
-            if (isRegisterMode) {
-                loginForm.classList.add('hidden');
-                registerForm.classList.remove('hidden');
-                subtitle.innerText = "Naya account create karein";
-                toggleBtn.innerText = "← Back to Login";
-            } else {
-                loginForm.classList.remove('hidden');
-                registerForm.classList.add('hidden');
-                subtitle.innerText = "Apne account mein login karein";
-                toggleBtn.innerText = "+ Create New User";
-            }
-        }
+// Leads API
+app.get('/api/leads', (req, res) => {
+    res.json(getLeads());
+});
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-            const errorMsg = document.getElementById('error-msg');
-
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    localStorage.setItem('crm_user', JSON.stringify(data));
-                    showDashboard(data);
-                } else {
-                    errorMsg.innerText = data.message || 'Invalid credentials';
-                    errorMsg.classList.remove('hidden');
-                }
-            } catch (err) {
-                errorMsg.innerText = 'Server connection error';
-                errorMsg.classList.remove('hidden');
-            }
-        }
-
-        async function handleRegister(e) {
-            e.preventDefault();
-            const username = document.getElementById('reg-username').value;
-            const password = document.getElementById('reg-password').value;
-            const role = document.getElementById('reg-role').value;
-            const name = document.getElementById('reg-name').value;
-            const errorMsg = document.getElementById('error-msg');
-
-            try {
-                const response = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, role, name })
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('User created successfully! Now you can login.');
-                    toggleMode();
-                } else {
-                    errorMsg.innerText = data.message || 'Registration failed';
-                    errorMsg.classList.remove('hidden');
-                }
-            } catch (err) {
-                errorMsg.innerText = 'Server connection error';
-                errorMsg.classList.remove('hidden');
-            }
-        }
-
-        function toggleForgotPassword() {
-            const username = prompt("Apna username daalein:");
-            if (!username) return;
-            const newPassword = prompt("Naya password daalein:");
-            if (!newPassword) return;
-
-            fetch('/api/forgot-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, newPassword })
-            })
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message);
-            })
-            .catch(err => {
-                alert('Kuch galat ho gaya!');
-            });
-        }
-
-        function showDashboard(user) {
-            document.getElementById('login-container').classList.add('hidden');
-            document.getElementById('dashboard-container').classList.remove('hidden');
-            document.getElementById('user-welcome').innerText = `Hello, ${user.name}`;
-            document.getElementById('user-role-badge').innerText = user.role;
-            loadLeads();
-        }
-
-        async function loadLeads() {
-            try {
-                const response = await fetch('/api/leads');
-                const leads = await response.json();
-                document.getElementById('total-leads-count').innerText = leads.length;
-                
-                const tbody = document.getElementById('leads-table-body');
-                tbody.innerHTML = '';
-                leads.forEach((lead, index) => {
-                    const rowId = `lead-row-${index}`;
-                    const isBlinking = activeCallRowId === rowId ? 'blinking-row' : '';
-                    tbody.innerHTML += `
-                        <tr id="${rowId}" class="hover:bg-slate-800/40 transition ${isBlinking}">
-                            <td class="px-6 py-4 font-medium text-white">${lead.name}</td>
-                            <td class="px-6 py-4">${lead.phone}</td>
-                            <td class="px-6 py-4">${lead.product || 'N/A'}</td>
-                            <td class="px-6 py-4"><span class="px-2.5 py-1 bg-amber-950/60 text-amber-400 border border-amber-800/50 text-xs font-semibold rounded-full">${lead.leadStatus || lead.status || 'New'}</span></td>
-                            <td class="px-6 py-4">
-                                <button onclick="startCall('${rowId}', '${lead.phone}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
-                                    📞 Call
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            } catch (err) {
-                console.error('Failed to load leads', err);
-            }
-        }
-
-        function startCall(rowId, phone) {
-            if (activeCallRowId) {
-                const prevRow = document.getElementById(activeCallRowId);
-                if (prevRow) prevRow.classList.remove('blinking-row');
-            }
-            activeCallRowId = rowId;
-            const currentRow = document.getElementById(rowId);
-            if (currentRow) {
-                currentRow.classList.add('blinking-row');
-            }
-            alert(`Calling ${phone} ... (Data is blinking on screen)`);
-        }
-
-        function handleLogout() {
-            localStorage.removeItem('crm_user');
-            location.reload();
-        }
-
-        window.onload = () => {
-            const savedUser = localStorage.getItem('crm_user');
-            if (savedUser) {
-                showDashboard(JSON.parse(savedUser));
-            }
-        };
-    </script>
-</body>
-</html>
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
