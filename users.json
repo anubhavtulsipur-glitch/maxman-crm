@@ -1,0 +1,16 @@
+[
+  {
+    "username": "owner",
+    "password": "123",
+    "role": "Owner",
+    "name": "Master Owner",
+    "phone": "9999999999"
+  },
+  {
+    "username": "hr_admin",
+    "password": "123",
+    "role": "HR",
+    "name": "HR Manager",
+    "phone": "8888888888"
+  }
+]
